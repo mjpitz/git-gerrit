@@ -1,0 +1,30 @@
+project_name: git-gerrit
+
+snapshot:
+  name_template: "{{ .ShortCommit }}"
+
+builds:
+  - id: git-gerrit
+    main: ./cmd/git-gerrit/main.go
+    binary: git-gerrit
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: git-gerrit
+    name_template: "git-gerrit_{{ .Os }}_{{ .Arch }}"
+    builds:
+      - git-gerrit
+
+checksum:
+  name_template: 'git-gerrit_checksums.txt'
+
+release:
+  header: ""
+  footer: ""
