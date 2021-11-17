@@ -36,7 +36,7 @@ func main() {
 
 	app := &cli.App{
 		Name:      "git-gerrit",
-		Usage:     "",
+		Usage:     "Gerrit <3 Git",
 		UsageText: "git-gerrit [options] <command>",
 		Version:   fmt.Sprintf("%s (%s)", version, commit),
 		Flags:     flagset.Extract(cfg),

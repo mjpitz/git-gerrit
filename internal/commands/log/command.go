@@ -30,10 +30,12 @@ var (
 
 	Command = &cli.Command{
 		Name:  "log",
+		Usage: "Output updates about a changeset",
 		Flags: flagset.Extract(config),
 		Action: func(ctx *cli.Context) error {
 			gerritAPI := common.GerritAPI(ctx.Context)
 
+			// TODO: infer from current "branch"
 			changeID := ctx.Args().Get(0)
 
 			accountInfo := make(map[int64]gerrit.AccountInfo)

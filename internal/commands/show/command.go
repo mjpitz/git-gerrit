@@ -15,9 +15,16 @@ const report = `
 REVIEW:  {{ baseURL }}/c/{{ .Project }}/+/{{ .ChangeNumber }}
 SUBJECT: {{ .Subject }}
 OWNER:   {{ .Owner.Name }} <{{ .Owner.Email }}>
+CREATED: {{ formatTimeStamp .Created }}
+UPDATED: {{ formatTimeStamp .Updated }}
 
-PROJECT: {{ .Project }}
-BRANCH:  {{ .Branch }}
+STATUS:           {{ .Status }}    +{{ .Insertions }} -{{ .Deletions }}
+WORK IN PROGRESS: {{ .WorkInProgress }}
+MERGEABLE:        {{ .Mergeable }}
+
+PROJECT:  {{ .Project }}
+BRANCH:   {{ .Branch }}
+COMMIT:   {{ .CurrentRevision }}
 
 REVIEWERS:
 {{- range $reviewerType, $reviewers := .Reviewers }}
@@ -35,6 +42,7 @@ var (
 
 	Command = &cli.Command{
 		Name:  "show",
+		Usage: "Show additional details about a given review",
 		Flags: flagset.Extract(showConfig),
 		Action: func(ctx *cli.Context) error {
 			gerritAPI := common.GerritAPI(ctx.Context)
@@ -54,7 +62,9 @@ var (
 			}
 
 			changeID := ctx.Args().Get(0)
-			info, err := gerritAPI.Client.GetChangeDetail(ctx.Context, changeID)
+			info, err := gerritAPI.Client.GetChangeDetail(ctx.Context, changeID, gerrit.QueryChangesOpt{
+				Fields: []string{"CURRENT_REVISION"},
+			})
 			if err != nil {
 				return err
 			}
@@ -66,7 +76,7 @@ var (
 					},
 					"getAccountInfo": getAccountInfo,
 					"formatTimeStamp": func(t gerrit.TimeStamp) string {
-						return t.Time().Format(time.RFC1123Z)
+						return t.Time().Local().Format(time.RFC1123Z)
 					},
 				}).
 				Parse(report)

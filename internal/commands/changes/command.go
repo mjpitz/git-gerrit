@@ -12,8 +12,8 @@ import (
 )
 
 type Config struct {
-	AllProjects bool   `json:"all_projects" alias:"A" usage:""`
-	Query       string `json:"query"        alias:"q" usage:""`
+	AllProjects bool   `json:"all_projects" alias:"A" usage:"ignore the current project and query accross all projects."`
+	Query       string `json:"query"        alias:"q" usage:"provide your own custom query to use."`
 }
 
 type Change struct {
@@ -27,6 +27,7 @@ var (
 
 	Command = &cli.Command{
 		Name:  "changes",
+		Usage: "List available changes to interact with",
 		Flags: flagset.Extract(config),
 		Action: func(ctx *cli.Context) error {
 			gerritAPI := common.GerritAPI(ctx.Context)
