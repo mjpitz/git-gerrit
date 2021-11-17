@@ -1,11 +1,11 @@
 version: "3.8"
 
 services:
-  git-gerrit:
-    container_name: git-gerrit
-    image: ${SKAFFOLD_DEFAULT_REPO:-ghcr.io/mjpitz}/git-gerrit
+  gerrit:
+    container_name: gerrit
+    image: gerritcodereview/gerrit:3.4.1
     restart: always
-    environment:
-      LOG_LEVEL: info
-      LOG_FORMAT: json
+    ports:
+      - "8080:8080"
+      - "29418:29418"
     command: []

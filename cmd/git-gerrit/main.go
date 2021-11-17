@@ -7,6 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mjpitz/git-gerrit/internal/commands/changes"
+	"github.com/mjpitz/git-gerrit/internal/commands/log"
+	"github.com/mjpitz/git-gerrit/internal/commands/show"
+	"github.com/mjpitz/git-gerrit/internal/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/mjpitz/git-gerrit/internal/commands"
@@ -37,16 +41,32 @@ func main() {
 		Version:   fmt.Sprintf("%s (%s)", version, commit),
 		Flags:     flagset.Extract(cfg),
 		Commands: []*cli.Command{
-			commands.VersionCommand,
+			changes.Command,
+			log.Command,
+			show.Command,
+			commands.Version,
 		},
-		Before: func(ctx *cli.Context) error {
+		Before: func(ctx *cli.Context) (err error) {
 			ctx.Context = zaputil.Setup(ctx.Context, cfg.Log)
 			ctx.Context = lifecycle.Setup(ctx.Context)
+			ctx.Context = common.SetupTableWriter(ctx.Context, ctx.App.Writer)
 
-			return nil
+			ctx.Context, err = common.SetupGitRepository(ctx.Context)
+			if err != nil {
+				return err
+			}
+
+			ctx.Context, err = common.SetupProject(ctx.Context)
+			if err != nil {
+				return err
+			}
+
+			ctx.Context, err = common.SetupGerritAPI(ctx.Context)
+			return err
 		},
 		After: func(ctx *cli.Context) error {
 			lifecycle.Resolve(ctx.Context)
+			common.TableWriter(ctx.Context).Render()
 
 			return nil
 		},
