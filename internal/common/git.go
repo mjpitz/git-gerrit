@@ -28,7 +28,9 @@ func SetupGitRepository(ctx context.Context) (context.Context, error) {
 	}
 
 	// plane open appropriately finds the repo root
-	repository, err := git.PlainOpen(dir)
+	repository, err := git.PlainOpenWithOptions(dir, &git.PlainOpenOptions{
+		DetectDotGit: true,
+	})
 	if err != nil {
 		return nil, err
 	}

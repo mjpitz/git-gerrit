@@ -18,9 +18,10 @@ OWNER:   {{ .Owner.Name }} <{{ .Owner.Email }}>
 CREATED: {{ formatTimeStamp .Created }}
 UPDATED: {{ formatTimeStamp .Updated }}
 
-STATUS:           {{ .Status }}    +{{ .Insertions }} -{{ .Deletions }}
+STATUS:           {{ .Status }}
 WORK IN PROGRESS: {{ .WorkInProgress }}
 MERGEABLE:        {{ .Mergeable }}
+MODIFICATIONS:    +{{ .Insertions }} -{{ .Deletions }}
 
 PROJECT:  {{ .Project }}
 BRANCH:   {{ .Branch }}
@@ -41,9 +42,10 @@ var (
 	showConfig = &Config{}
 
 	Command = &cli.Command{
-		Name:  "show",
-		Usage: "Show additional details about a given review",
-		Flags: flagset.Extract(showConfig),
+		Name:      "show",
+		Usage:     "Show additional details about a given review",
+		UsageText: "show [options] <changeID>",
+		Flags:     flagset.Extract(showConfig),
 		Action: func(ctx *cli.Context) error {
 			gerritAPI := common.GerritAPI(ctx.Context)
 
@@ -76,7 +78,7 @@ var (
 					},
 					"getAccountInfo": getAccountInfo,
 					"formatTimeStamp": func(t gerrit.TimeStamp) string {
-						return t.Time().Local().Format(time.RFC1123Z)
+						return t.Time().Local().Format(time.RFC1123)
 					},
 				}).
 				Parse(report)

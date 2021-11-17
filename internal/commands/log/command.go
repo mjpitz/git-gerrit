@@ -29,9 +29,10 @@ var (
 	config = &Config{}
 
 	Command = &cli.Command{
-		Name:  "log",
-		Usage: "Output updates about a changeset",
-		Flags: flagset.Extract(config),
+		Name:      "log",
+		Usage:     "Output updates about a changeset",
+		UsageText: "log [options] <changeID>",
+		Flags:     flagset.Extract(config),
 		Action: func(ctx *cli.Context) error {
 			gerritAPI := common.GerritAPI(ctx.Context)
 

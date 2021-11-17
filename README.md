@@ -1,6 +1,6 @@
 # git-gerrit
 
-A helper tool for working with Gerrit changesets and git.  
+A helper tool for working with Gerrit change sets and git.  
 
 ## Status
 
@@ -12,9 +12,10 @@ Mostly started with some simple readonly operations to get started.
   - `gerrit show :changeId`
 - [x] Show an activity log of events related to an associated change.
   - `gerrit log :changeId`
-- [ ] Checkout / create a new changeset.
-- [ ] Pull updates from a changeset into a local branch.
-- [ ] Push a changeset.
+- [x] Checkout an existing change set.
+  - `gerrit checkout :changeID`
+- [ ] Create a new change set.
+- [ ] Push an updated change set.`
 
 ## Usage
 
@@ -23,7 +24,7 @@ _Note:_ tool must be run from within a repository root currently.
 ### Installation
 
 ```
-go install github.com/mjpitz/git-gerrit@latest
+go install github.com/mjpitz/git-gerrit/cmd/git-gerrit@latest
 
 # for a shorter syntax...
 alias gerrit=git-gerrit
@@ -40,6 +41,17 @@ UPDATED                         CHANGE ID                                       
 2021-11-17 09:40:44 -0600 CST   I3cad05d0c2c8c9c9b1cad8b182fb459ccf3732ea       ...
 2021-11-17 05:54:31 -0600 CST   I83d34367aab1f3c0d46a044f54980b2d50174b19       ...
 2021-11-16 14:16:38 -0600 CST   I0cc497873eb5732623ef2d9bc5f78ba1cc48c6b8       ...
+```
+
+### Checking out a change set
+
+When checking out a change set, a new branch is actually created (gerrit branches )
+
+```
+$ gerrit checkout 1234  # or gerrit checkout Change-Id
+
+$ git branch | grep "*" 
+* gerrit/6218
 ```
 
 ### Showing a change set

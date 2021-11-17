@@ -2,6 +2,7 @@ package changes
 
 import (
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/mjpitz/git-gerrit/internal/common"
@@ -17,18 +18,19 @@ type Config struct {
 }
 
 type Change struct {
-	Updated  time.Time
 	ChangeID string `json:"change_id"`
 	Subject  string
+	Updated  string
 }
 
 var (
 	config = &Config{}
 
 	Command = &cli.Command{
-		Name:  "changes",
-		Usage: "List available changes to interact with",
-		Flags: flagset.Extract(config),
+		Name:      "changes",
+		UsageText: "changes [options]",
+		Usage:     "List available changes to interact with",
+		Flags:     flagset.Extract(config),
 		Action: func(ctx *cli.Context) error {
 			gerritAPI := common.GerritAPI(ctx.Context)
 			projectID := common.Project(ctx.Context)
@@ -55,9 +57,9 @@ var (
 
 			for _, change := range changes {
 				common.WriteRow(writer, &Change{
-					Updated:  time.Time(change.Updated).Local(),
-					ChangeID: change.ChangeID,
+					ChangeID: strconv.Itoa(change.ChangeNumber),
 					Subject:  change.Subject,
+					Updated:  time.Time(change.Updated).Local().Format(time.RFC1123),
 				})
 			}
 

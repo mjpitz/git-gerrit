@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/mjpitz/git-gerrit/internal/commands/changes"
+	"github.com/mjpitz/git-gerrit/internal/commands/checkout"
 	"github.com/mjpitz/git-gerrit/internal/commands/log"
 	"github.com/mjpitz/git-gerrit/internal/commands/show"
 	"github.com/mjpitz/git-gerrit/internal/common"
@@ -42,6 +43,7 @@ func main() {
 		Flags:     flagset.Extract(cfg),
 		Commands: []*cli.Command{
 			changes.Command,
+			checkout.Command,
 			log.Command,
 			show.Command,
 			commands.Version,
