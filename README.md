@@ -15,7 +15,8 @@ Mostly started with some simple readonly operations to get started.
 - [x] Checkout an existing change set.
   - `gerrit checkout :changeID`
 - [ ] Create a new change set.
-- [ ] Push an updated change set.`
+- [ ] Split an active change set.
+- [ ] Push an updated change set.
 
 ## Usage
 
