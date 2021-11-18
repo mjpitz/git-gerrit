@@ -1,11 +1,10 @@
 package checkout
 
 import (
-	"errors"
 	"fmt"
-	"os/exec"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/mjpitz/git-gerrit/internal/common"
 	"github.com/urfave/cli/v2"
@@ -21,48 +20,52 @@ var (
 			gerritAPI := common.GerritAPI(ctx.Context)
 			repo := common.GitRepository(ctx.Context)
 
-			changeID := ctx.Args().Get(0)
-
-			change, err := gerritAPI.Client.GetChange(ctx.Context, changeID, gerrit.QueryChangesOpt{
-				Fields: []string{"CURRENT_REVISION"},
-			})
-
-			if err != nil {
-				return err
-			}
-
 			wt, err := repo.Worktree()
 			if err != nil {
 				return fmt.Errorf("failed to obtain worktree: %v", err)
 			}
 
-			revision := plumbing.NewHash(change.CurrentRevision)
-			err = wt.Checkout(&git.CheckoutOptions{
-				Hash: revision,
-			})
+			changeID := ctx.Args().Get(0)
 
+			change, err := gerritAPI.Client.GetChange(ctx.Context, changeID, gerrit.QueryChangesOpt{
+				Fields: []string{"CURRENT_REVISION"},
+			})
 			if err != nil {
-				return fmt.Errorf("failed to checkout current revision: %v", err)
+				return err
 			}
 
 			branchName := fmt.Sprintf("gerrit/%d", change.ChangeNumber)
-			err = repo.DeleteBranch(branchName)
-			switch {
-			case errors.Is(err, git.ErrBranchNotFound):
-			case err != nil:
-				return fmt.Errorf("failed to delete last branch: %v", err)
+			branchRefName := plumbing.NewBranchReferenceName(branchName)
+
+			// start from proper branch
+			// TODO: eventually start from proper ancestor
+
+			err = wt.Checkout(&git.CheckoutOptions{
+				Branch: plumbing.NewBranchReferenceName(change.Branch),
+			})
+			if err != nil {
+				return fmt.Errorf("failed to checkout starting branch: %v", err)
 			}
 
-			cmd := fmt.Sprintf("git branch -D %s; git checkout -b %s", branchName, branchName)
-			err = exec.Command("bash", "-c", cmd).Run()
+			// fetch the current changeset based on the patch number
+			revision := change.Revisions[change.CurrentRevision]
+
+			err = repo.Fetch(&git.FetchOptions{
+				RemoteName: "gerrit",
+				RefSpecs: []config.RefSpec{
+					config.RefSpec(revision.Ref + ":" + string(branchRefName)),
+				},
+				Force: true,
+			})
 			if err != nil {
-				return fmt.Errorf("failed to checkout new branch: %v", err)
+				return fmt.Errorf("failed to fetch updates for branch: %v", err)
 			}
 
-			cmd = fmt.Sprintf("git rebase %s", change.Branch)
-			err = exec.Command("bash", "-c", cmd).Run()
+			err = wt.Checkout(&git.CheckoutOptions{
+				Branch: branchRefName,
+			})
 			if err != nil {
-				return fmt.Errorf("failed to rebase new branch: %v", err)
+				return fmt.Errorf("failed to checkout branch: %v", err)
 			}
 
 			return nil

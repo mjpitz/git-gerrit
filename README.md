@@ -38,10 +38,11 @@ alias gerrit=git-gerrit
 ```
 $ gerrit changes
 
-UPDATED                         CHANGE ID                                       SUBJECT                                                                                                                                            
-2021-11-17 09:40:44 -0600 CST   I3cad05d0c2c8c9c9b1cad8b182fb459ccf3732ea       ...
-2021-11-17 05:54:31 -0600 CST   I83d34367aab1f3c0d46a044f54980b2d50174b19       ...
-2021-11-16 14:16:38 -0600 CST   I0cc497873eb5732623ef2d9bc5f78ba1cc48c6b8       ...
+CHANGE ID       SUBJECT                 UPDATED
+6359            ...                     Thu, 18 Nov 2021 10:39:54 CST
+6218            ...                     Thu, 18 Nov 2021 10:38:06 CST
+6298            ...                     Thu, 18 Nov 2021 09:21:59 CST
+6354            ...                     Thu, 18 Nov 2021 08:48:22 CST
 ```
 
 ### Checking out a change set
