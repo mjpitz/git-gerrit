@@ -37,16 +37,6 @@ var (
 			branchName := fmt.Sprintf("gerrit/%d", change.ChangeNumber)
 			branchRefName := plumbing.NewBranchReferenceName(branchName)
 
-			// start from proper branch
-			// TODO: eventually start from proper ancestor
-
-			err = wt.Checkout(&git.CheckoutOptions{
-				Branch: plumbing.NewBranchReferenceName(change.Branch),
-			})
-			if err != nil {
-				return fmt.Errorf("failed to checkout starting branch: %v", err)
-			}
-
 			// fetch the current changeset based on the patch number
 			revision := change.Revisions[change.CurrentRevision]
 
